@@ -123,13 +123,22 @@ def aggregate_conditions(*conditions):
     This will probably involve some kind of scoring based on the counts of ideal / acceptable / unacceptable 
     observations, but I'm not sure about how to weight different conditions or if we want to auto-negate anything
     with an "unacceptable" value (which would be a good use of unacceptable).
+
+    Could use this to set either
+    - the color of a constant-height bar in the background; range from some bad value (red/brown) to some good 
+      value (probably green but colorblind friendly?)
+    - the opacity value of a constant-height green bar; if dark green, get out there!  
     '''
     counts = Counter(conditions)
-    # print(counts)
-    if all([x == 'Ideal' for x in conditions]):
-        return "Get out there, homie!!!"
-    elif any([x == 'Unacceptable' for x in conditions]):
-        return "There's a deal-breaker somewhere :/"
+    if counts['Unacceptable'] != 0:
+        return 0 
     else:
-        return "You can probably find something decent to climb!"
-    
+        return (2 * counts['Ideal'] + counts['Acceptable']) / sum(counts.values())
+
+    ## old logic:
+    # if all([x == 'Ideal' for x in conditions]):
+    #     return "Get out there, homie!!!"
+    # elif any([x == 'Unacceptable' for x in conditions]):
+    #     return "There's a deal-breaker somewhere :/"
+    # else:
+    #     return "You can probably find something decent to climb!"

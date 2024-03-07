@@ -21,6 +21,7 @@ This is an early, unstable, and barely useful iteration of this app -- this is m
 * Selection from a handful of predefined locations
 * User-specified preferences for ideal and acceptable conditions
 * Retrieve hourly and daily forecast for all selected locations
+* Show current conditions for selected locations as a heads-up summary
 * Plot daily forecast (temperature, humidity, precipitation chance)
 
 ### Still To Do
@@ -34,7 +35,6 @@ This is an early, unstable, and barely useful iteration of this app -- this is m
   * Color sections that are ideal or acceptable
   * Could also have a time filter to clean this up
 * Color-coding plots based on overall view of condition 
-* A "what's good now" view of current conditions
 * Pulling climbing areas from OpenBeta
 
 ### Unknown / Needs Refinement / Long Term

@@ -36,7 +36,7 @@ with st.expander("Configure condition preferences"):
     ideal_max_precip = st.slider("Ideal max precipitation chance", min_value=0, max_value=100, value=10)
     precipitation = Condition(acceptable_low=0, acceptable_high=acceptable_max_precip, ideal_low=0, ideal_high=ideal_max_precip)
 
-
+# pull everything up front
 locations = {}
 daily_forecasts = {}
 hourly_forecasts = {}
@@ -55,17 +55,50 @@ hourly_df = pd.concat([forecast.df for forecast in hourly_forecasts.values()])
 daily_df['humidity_condition'] = daily_df['humidity'].apply(humidity.assess)
 daily_df['precipitation_condition'] = daily_df['precipitation'].apply(precipitation.assess)
 daily_df['temperature_condition'] = daily_df['temperature'].apply(temperature.assess)
-daily_df['overall'] = daily_df.apply(lambda x: aggregate_conditions(x['humidity_condition'], x['precipitation_condition'], x['temperature_condition']), axis=1)
+daily_df['condition_score'] = daily_df.apply(lambda x: aggregate_conditions(x['humidity_condition'], x['precipitation_condition'], x['temperature_condition']), axis=1)
 
 hourly_df['humidity_condition'] = hourly_df['humidity'].apply(humidity.assess)
 hourly_df['precipitation_condition'] = hourly_df['precipitation'].apply(precipitation.assess)
 hourly_df['temperature_condition'] = hourly_df['temperature'].apply(temperature.assess)
-hourly_df['overall'] = hourly_df.apply(lambda x: aggregate_conditions(x['humidity_condition'], x['precipitation_condition'], x['temperature_condition']), axis=1)
+hourly_df['condition_score'] = hourly_df.apply(lambda x: aggregate_conditions(x['humidity_condition'], x['precipitation_condition'], x['temperature_condition']), axis=1)
 
-st.write("## Current Conditions")
-st.dataframe(hourly_df.query("number == 1")[['area', 'overall', 'temperature', 'humidity', 'precipitation', 'temperature_condition', 'humidity_condition', 'precipitation_condition', 'shortForecast']], hide_index=True)
+# convert condition results to emojis for the current condition readout
+condition_to_emoji = {
+    'Ideal': ':white_check_mark:',
+    'Acceptable': ':ok:',
+    'Unacceptable': ':no_entry_sign:' # or :bricks: or :poop:
+}
+st.write(
+    f"""
+    ## Current Conditions: What's Good Now
+    This section shows you what's happening now at each area. You can tweak
+    specific cutoffs in the collapsed menu just above this section, but for reference:
+    - {condition_to_emoji['Ideal']} indicates an ideal value for a particular condition
+    - {condition_to_emoji['Acceptable']} indicates acceptable conditions
+    - {condition_to_emoji['Unacceptable']} indicates unacceptable conditions
+    """
+)
 
-st.write("## Forecasts")
+# use the first hourly forecast entry for each area for current conditions (it's the current hour at the time of the request)
+current_df = hourly_df.query("number == 1")[['area', 'temperature', 'humidity', 'precipitation', 
+                                             'temperature_condition', 'humidity_condition', 'precipitation_condition', 'shortForecast']].set_index("area")
+
+# write the current conditions
+current_columns = st.columns(3)
+for i, area in enumerate(selected_areas):
+    area_row = current_df.loc[area]
+    with current_columns[i % 3]:
+        st.markdown(            
+            f"""
+            ##### {area}
+            {area_row['shortForecast']}
+            - {area_row['temperature']}&deg;F {condition_to_emoji[area_row['temperature_condition']]}
+            - {area_row['humidity']}% humidity {condition_to_emoji[area_row['humidity_condition']]}
+            - {area_row['precipitation']}% precipitation {condition_to_emoji[area_row['precipitation_condition']]}
+            """
+        )
+
+st.write("## Forecasts (Under Construction!)")
 st.write("Use the radio button to select whether you want to see forecasts by hour or by 12-hour blocks. Daily will give you a better sense of larger blocks of time, while hourly will be more detailed. You can also choose to filter to daytime hours only.")
 col1, col2 = st.columns(2)
 with col1:
