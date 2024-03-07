@@ -15,9 +15,9 @@ with st.expander("Configure condition preferences"):
     st.markdown(
         """
         Use these options to select ideal and acceptable conditions.
-        - **Ideal** conditions describe the best case scenario; if all conditions are ideal at once, you definitely want to be climbing.
-        - **Unacceptable** conditions should be considered deal-breakers; if _any_ condition is unacceptable, you won't go.
-        - Anything between unacceptable and ideal is considered acceptable or decent enough to go as long as other conditions are decent.
+        - **Ideal** conditions describe the best case scenario; if all conditions are ideal at once, you definitely want to be climbing
+        - **Acceptable** conditions are less preferred than the ideal values, but you would still climb in them
+        - Anything outside of the acceptable conditions values should be considered deal-breakers; if _any_ condition is unacceptable, you won't go
         """
     )
 
