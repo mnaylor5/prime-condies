@@ -25,7 +25,14 @@ This is an early, unstable, and barely useful iteration of this app -- this is m
 
 ### Still To Do
 
-* Hourly plots
+* Decide what makes sense to show in the daily plots
+  * If still doing series lineplots, come up with something helpful for the hovertext
+  * Could instead do a heatmap with text annotations
+  * Or could highlight/color the text individually in this breakout
+* Figure out what to do with the hourly forecasts
+  * Limit to 48 hour periods? Could follow something like [this](https://forecast.weather.gov/MapClick.php?lat=35.0458&lon=-85.2704&unit=0&lg=english&FcstType=graphical)
+  * Color sections that are ideal or acceptable
+  * Could also have a time filter to clean this up
 * Color-coding plots based on overall view of condition 
 * A "what's good now" view of current conditions
 * Pulling climbing areas from OpenBeta
@@ -34,4 +41,4 @@ This is an early, unstable, and barely useful iteration of this app -- this is m
 
 * When it last rained at a location
 * Something with dewpoint 
-* Rock temperature
+* Estimate rock temperature
