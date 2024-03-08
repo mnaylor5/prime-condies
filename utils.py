@@ -119,26 +119,28 @@ class Condition:
         
 def aggregate_conditions(*conditions):
     '''
-    A function to wrap up the decision making process; placeholder until I get more sophisticated logic.
-    This will probably involve some kind of scoring based on the counts of ideal / acceptable / unacceptable 
-    observations, but I'm not sure about how to weight different conditions or if we want to auto-negate anything
-    with an "unacceptable" value (which would be a good use of unacceptable).
+    A function to wrap up multiple condition values. There are currently 5 outcomes:
+    - all ideal = "PRIME" / 1.0
+    - more ideal than acceptable = "Great conditions" / 0.75
+    - more acceptable than ideal = "Pretty good" / 0.5
+    - all acceptable = "Better than not climbing" / 0.25
+    - ANY unacceptable = "Trash" / 0.0
 
-    Could use this to set either
-    - the color of a constant-height bar in the background; range from some bad value (red/brown) to some good 
-      value (probably green but colorblind friendly?)
-    - the opacity value of a constant-height green bar; if dark green, get out there!  
+    This doesn't account for any extra weighting between conditions (and it assumes 
+    an odd number of conditions), but we could use these to populate...
+    - the color of a heatmap tile
+    - the color of a constant-height bar in the background of a line plot; range from 
+      some colorblind-friendly set of bad color to good color
+      - monochrome could be a good option (e.g. white to dark blue)
     '''
     counts = Counter(conditions)
     if counts['Unacceptable'] != 0:
-        return 0 
+        return 0
+    elif counts['Ideal'] == len(conditions):
+        return 1
+    elif counts['Acceptable'] == len(conditions):
+        return 0.25
+    elif counts['Ideal'] > counts['Acceptable']:
+        return 0.75
     else:
-        return (2 * counts['Ideal'] + counts['Acceptable']) / sum(counts.values())
-
-    ## old logic:
-    # if all([x == 'Ideal' for x in conditions]):
-    #     return "Get out there, homie!!!"
-    # elif any([x == 'Unacceptable' for x in conditions]):
-    #     return "There's a deal-breaker somewhere :/"
-    # else:
-    #     return "You can probably find something decent to climb!"
+        return 0.5

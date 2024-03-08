@@ -22,14 +22,10 @@ This is an early, unstable, and barely useful iteration of this app -- this is m
 * User-specified preferences for ideal and acceptable conditions
 * Retrieve hourly and daily forecast for all selected locations
 * Show current conditions for selected locations as a heads-up summary
-* Plot daily forecast (temperature, humidity, precipitation chance)
+* Plot daily condition outlook as a heatmap
 
 ### Still To Do
 
-* Decide what makes sense to show in the daily plots
-  * If still doing series lineplots, come up with something helpful for the hovertext
-  * Could instead do a heatmap with text annotations
-  * Or could highlight/color the text individually in this breakout
 * Figure out what to do with the hourly forecasts
   * Limit to 48 hour periods? Could follow something like [this](https://forecast.weather.gov/MapClick.php?lat=35.0458&lon=-85.2704&unit=0&lg=english&FcstType=graphical)
   * Color sections that are ideal or acceptable

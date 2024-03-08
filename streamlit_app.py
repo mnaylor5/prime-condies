@@ -8,7 +8,7 @@ st.title("Prime Condies")
 st.write("Welcome to Prime Condies, a simple app for climbing conditions. Get psyched :the_horns:")
 
 selected_areas = st.multiselect("Select climbing areas for forecasts", 
-                                options=DEFAULT_LOCATIONS.keys(), default=['Dayton Pocket', 'Rocktown', 'Upper Middle Creek', "Joe's Valley"])
+                                options=DEFAULT_LOCATIONS.keys(), default=['Dayton Pocket', 'Rocktown', 'Upper Middle Creek', "Obed (Lilly Boulders)"])
 
 # condition details hidden in expander
 with st.expander("Configure condition preferences"):
@@ -107,7 +107,7 @@ with col2:
     daytime_only = st.checkbox("Daytime hours only?", value=True)
 
 if forecast_selection == 'Daily':
-    st.plotly_chart(plot.plot_daily_forecast(daily_df, filter_to_daytime=daytime_only))
+    st.plotly_chart(plot.plot_daily_heatmap(daily_df, filter_to_daytime=daytime_only))
 
 with st.expander("About the app"):
     st.write(
