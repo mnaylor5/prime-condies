@@ -113,7 +113,7 @@ else:
 
     if forecast_selection == 'Daily':
         daytime_only = st.checkbox("Daytime hours only?", value=True)
-        st.plotly_chart(plot.plot_daily_heatmap(daily_df, filter_to_daytime=daytime_only), use_container_width=True)
+        st.plotly_chart(plot.plot_daily_heatmap(daily_df, filter_to_daytime=daytime_only))
     else:
         col1, col2 = st.columns(2)
         with col1:
@@ -125,7 +125,7 @@ else:
             hourly_df['startTime'] >= starting_time
         ]
         
-        st.plotly_chart(plot.plot_hourly_heatmap(hourly_plot_df, periods=hourly_periods), use_container_width=True)
+        st.plotly_chart(plot.plot_hourly_heatmap(hourly_plot_df, periods=hourly_periods))
 
         st.write("Note: You can click and drag horizontally to zoom to a particular time period on this plot. Double-click to reset.")
 
