@@ -92,6 +92,8 @@ class ForecastResponse:
         self.df['precipitation'] = self.df['probabilityOfPrecipitation'].apply(lambda x: x.get("value")).fillna(0.0)
         self.start_time = self.df['startTime'].min()
         self.end_time = self.df['endTime'].max()
+        # date columns contain timezone information that pandas doesn't like
+        self.df['startTime'] = pd.to_datetime(self.df['startTime'].str[:-6])
     
     def convert_celsius_to_fahrenheit(self, x):
         return x * 9/5 + 32

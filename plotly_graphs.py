@@ -26,7 +26,7 @@ def plot_daily_forecast(daily_df, filter_to_daytime=True):
     fig.update_legends(title=None)
     return fig
 
-score_to_name = {1:"PRIME", 0.75:"Great", 0.5:"Pretty good", 0.25:"Better than the gym", 0:"Trash :("}
+score_to_name = {1:"PRIME", 0.75:"Great", 0.5:"Pretty good", 0.25:"Better than the gym", 0:"Trash :(", None:"No data"}
 
 def plot_daily_heatmap(daily_df, filter_to_daytime=True):
     '''
@@ -55,7 +55,7 @@ def plot_daily_heatmap(daily_df, filter_to_daytime=True):
         zmax=1,
         xgap=0.2,
         ygap=0.2,
-        colorscale="greens", # see https://plotly.com/python/builtin-colorscales/; hot or ice are fine for now (darker = worse; lighter = better)
+        colorscale="greens", 
         colorbar = dict(
             tickmode="array",
             tickvals=[0, 0.25, 0.5, 0.75, 1],
@@ -64,4 +64,45 @@ def plot_daily_heatmap(daily_df, filter_to_daytime=True):
         )
     ))
     fig.update_layout(title="High Level Condition Outlook (Best Options First)", template="plotly_white")
+    return fig
+
+def plot_hourly_heatmap(hourly_df, periods=48):
+    '''
+    Use the wide/tidy `daily_df` to plot a heatmap whose rows are areas and columns
+    are forecast entries
+    '''
+
+    min_period = hourly_df['number'].min()
+    max_period = min_period + periods
+
+    hourly_heatmap_df = hourly_df.set_index('area')\
+        .query(f"number < {max_period}")\
+        [['startTime', 'condition_score']]\
+        .pivot(columns='startTime', values='condition_score')
+    
+    hourly_heatmap_df['sum'] = hourly_heatmap_df.sum(axis=1)
+    hourly_heatmap_df = hourly_heatmap_df.sort_values("sum").drop(columns='sum')
+    heatmap_data = hourly_heatmap_df.values
+    heatmap_text = np.vectorize(score_to_name.__getitem__)(heatmap_data)
+    
+    fig = go.Figure(data = go.Heatmap(
+        z = heatmap_data,
+        text = heatmap_text,
+        x = hourly_heatmap_df.columns,
+        y = hourly_heatmap_df.index,
+        hovertemplate="%{x} at %{y}:<br>%{text}",
+        zmin=0,
+        zmax=1,
+        xgap=0.2,
+        ygap=0.2,
+        name="",
+        colorscale="greens", 
+        colorbar = dict(
+            tickmode="array",
+            tickvals=[0, 0.25, 0.5, 0.75, 1],
+            ticktext = [score_to_name[x] for x in [0, 0.25, 0.5, 0.75, 1]],
+            ticks="outside"
+        )
+    ))
+    fig.update_layout(title="Hourly Condition Outlook (Best Options First)", template="plotly_white")
     return fig

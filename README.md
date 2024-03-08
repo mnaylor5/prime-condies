@@ -12,29 +12,21 @@ Prime Condies is a `streamlit` app which runs on [Streamlit Community Cloud](htt
 
 This is an early, unstable, and barely useful iteration of this app -- this is more or less just a wireframe that proves that I can retrieve the necessary data, assess conditions, and plot something. This should take shape over the next several weeks. 
 
-### Work in Progress
-
-* Refine condition aggregation into a composite value to assess each time period -- will drive coloring/recommendations
-
 ### Current Features
 
 * Selection from a handful of predefined locations
 * User-specified preferences for ideal and acceptable conditions
 * Retrieve hourly and daily forecast for all selected locations
 * Show current conditions for selected locations as a heads-up summary
-* Plot daily condition outlook as a heatmap
+* Plot hourly and daily condition outlook as a heatmap
 
 ### Still To Do
 
-* Figure out what to do with the hourly forecasts
-  * Limit to 48 hour periods? Could follow something like [this](https://forecast.weather.gov/MapClick.php?lat=35.0458&lon=-85.2704&unit=0&lg=english&FcstType=graphical)
-  * Color sections that are ideal or acceptable
-  * Could also have a time filter to clean this up
-* Color-coding plots based on overall view of condition 
+* Dewpoint condition (refer to https://www.weather.gov/arx/why_dewpoint_vs_humidity for cutoffs)
 * Pulling climbing areas from OpenBeta
+* Optional detailed plot of temp/humidity/precip for a given area (below the condition forecast)
 
 ### Unknown / Needs Refinement / Long Term
 
 * When it last rained at a location
-* Something with dewpoint 
 * Estimate rock temperature

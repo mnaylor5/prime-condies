@@ -8,7 +8,8 @@ st.title("Prime Condies")
 st.write("Welcome to Prime Condies, a simple app for climbing conditions. Get psyched :the_horns:")
 
 selected_areas = st.multiselect("Select climbing areas for forecasts", 
-                                options=DEFAULT_LOCATIONS.keys(), default=['Dayton Pocket', 'Rocktown', 'Upper Middle Creek', "Obed (Lilly Boulders)"])
+                                options=DEFAULT_LOCATIONS.keys(), 
+                                default=['Dayton Pocket', 'Rocktown', 'Upper Middle Creek', "Obed (Lilly Boulders)"])
 
 # condition details hidden in expander
 with st.expander("Configure condition preferences"):
@@ -61,6 +62,7 @@ hourly_df['humidity_condition'] = hourly_df['humidity'].apply(humidity.assess)
 hourly_df['precipitation_condition'] = hourly_df['precipitation'].apply(precipitation.assess)
 hourly_df['temperature_condition'] = hourly_df['temperature'].apply(temperature.assess)
 hourly_df['condition_score'] = hourly_df.apply(lambda x: aggregate_conditions(x['humidity_condition'], x['precipitation_condition'], x['temperature_condition']), axis=1)
+hourly_df['hour'] = hourly_df['startTime'].dt.hour
 
 # convert condition results to emojis for the current condition readout
 condition_to_emoji = {
@@ -98,16 +100,32 @@ for i, area in enumerate(selected_areas):
             """
         )
 
-st.write("## Forecasts (Under Construction!)")
-st.write("Use the radio button to select whether you want to see forecasts by hour or by 12-hour blocks. Daily will give you a better sense of larger blocks of time, while hourly will be more detailed. You can also choose to filter to daytime hours only.")
-col1, col2 = st.columns(2)
-with col1:
-    forecast_selection = st.radio("Forecast detail", options=["Daily", "Hourly"])
-with col2:
-    daytime_only = st.checkbox("Daytime hours only?", value=True)
+st.write("## Condition Outlook")
+st.write("""
+Use the radio button to select whether you want to see forecasts by hour or by 12-hour blocks. Hourly forecasts will be more detailed,
+while daily uses the highs (during daytime) and lows (at night). The forecasts will appear as a heatmap grid of areas and time periods, 
+where each entry is shaded according to the overall condition quality (darker green = better condies). 
+""")
+forecast_selection = st.radio("Forecast detail", options=["Hourly", "Daily"])
+    
 
 if forecast_selection == 'Daily':
+    daytime_only = st.checkbox("Daytime hours only?", value=True)
     st.plotly_chart(plot.plot_daily_heatmap(daily_df, filter_to_daytime=daytime_only))
+else:
+    col1, col2 = st.columns(2)
+    with col1:
+        starting_time = st.selectbox("Select starting point for hourly forecast", options=hourly_df['startTime'].unique())
+    with col2:
+        hourly_periods = st.number_input("Hourly periods to plot", value=hourly_df['number'].max(), min_value=12, max_value=hourly_df['number'].max())
+
+    hourly_plot_df = hourly_df[
+        hourly_df['startTime'] >= starting_time
+    ]
+    
+    st.plotly_chart(plot.plot_hourly_heatmap(hourly_plot_df, periods=hourly_periods))
+
+    st.write("Note: You can click and drag horizontally to zoom to a particular time period on this plot. Double-click to reset.")
 
 with st.expander("About the app"):
     st.write(
