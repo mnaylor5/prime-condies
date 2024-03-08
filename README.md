@@ -23,10 +23,14 @@ This is an early, unstable, and barely useful iteration of this app -- this is m
 ### Still To Do
 
 * Dewpoint condition (refer to https://www.weather.gov/arx/why_dewpoint_vs_humidity for cutoffs)
-* Pulling climbing areas from OpenBeta
+  * Would need to rework the cutoff levels which assume an odd number of conditions
+* Pulling climbing areas from OpenBeta (i.e. scrubbing the dump of areas on their GitHub)
+  * Also select better defaults 
 * Optional detailed plot of temp/humidity/precip for a given area (below the condition forecast)
 
 ### Unknown / Needs Refinement / Long Term
 
+* Is there a better way of aggregating daily info than using the highs?
+  * Maybe a count of hours where `condition_score > 0`? In other words, X hours with acceptable conditions
 * When it last rained at a location
 * Estimate rock temperature

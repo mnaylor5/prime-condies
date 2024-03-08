@@ -26,7 +26,7 @@ def plot_daily_forecast(daily_df, filter_to_daytime=True):
     fig.update_legends(title=None)
     return fig
 
-score_to_name = {1:"PRIME", 0.75:"Great", 0.5:"Pretty good", 0.25:"Better than the gym", 0:"Trash :(", None:"No data"}
+score_to_name = {1:"PRIME", 0.75:"Great", 0.5:"Pretty good", 0.25:"Better than the gym", 0:"Trash :(", '':"No data"}
 
 def plot_daily_heatmap(daily_df, filter_to_daytime=True):
     '''
@@ -42,7 +42,7 @@ def plot_daily_heatmap(daily_df, filter_to_daytime=True):
     
     daily_heatmap_df['sum'] = daily_heatmap_df.sum(axis=1)
     daily_heatmap_df = daily_heatmap_df.sort_values("sum")[names_in_order]
-    heatmap_data = daily_heatmap_df.values
+    heatmap_data = daily_heatmap_df.fillna('').values
     heatmap_text = np.vectorize(score_to_name.__getitem__)(heatmap_data)
     
     fig = go.Figure(data = go.Heatmap(
@@ -82,7 +82,7 @@ def plot_hourly_heatmap(hourly_df, periods=48):
     
     hourly_heatmap_df['sum'] = hourly_heatmap_df.sum(axis=1)
     hourly_heatmap_df = hourly_heatmap_df.sort_values("sum").drop(columns='sum')
-    heatmap_data = hourly_heatmap_df.values
+    heatmap_data = hourly_heatmap_df.fillna('').values
     heatmap_text = np.vectorize(score_to_name.__getitem__)(heatmap_data)
     
     fig = go.Figure(data = go.Heatmap(

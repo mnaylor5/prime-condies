@@ -18,7 +18,8 @@ DEFAULT_LOCATIONS = {
     "Upper Middle Creek": (35.149630,-85.351334),
     "Woodcock Cove": (35.337004,-85.4532359),
     "Foster Falls": (35.1821082,-85.6754071),
-    "Obed (Lilly Boulders)": (36.1026999,-84.7240969)
+    "Obed (Lilly Boulders)": (36.1026999,-84.7240969),
+    "Moe's Valley": (37.06928, -113.62301)
 }
 
 # base class for locations + managing API requests
