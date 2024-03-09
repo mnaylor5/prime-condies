@@ -1,7 +1,7 @@
 import streamlit as st 
 import pandas as pd
-from utils import DEFAULT_LOCATIONS, ClimbingLocation, Condition, aggregate_conditions
-import plotly_graphs as plot
+from src.utils import DEFAULT_LOCATIONS, ClimbingLocation, Condition, aggregate_conditions
+import src.plotly_graphs as plot
 
 st.set_page_config(page_title="Prime Condies: A Weather Tool for Climbers", page_icon=":man_climbing:")
 st.title("Prime Condies")
