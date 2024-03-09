@@ -14,7 +14,7 @@ This is an early, unstable, and barely useful iteration of this app -- this is m
 
 ### Current Features
 
-* Selection from a handful of predefined locations
+* Location selection from OpenBeta's static dataset
 * User-specified preferences for ideal and acceptable conditions
 * Retrieve hourly and daily forecast for all selected locations
 * Show current conditions for selected locations as a heads-up summary
@@ -22,11 +22,10 @@ This is an early, unstable, and barely useful iteration of this app -- this is m
 
 ### Still To Do
 
+* Clean up Current Conditions display (maybe a table instead?)
 * Probably figure out a good way to move the colorbar to the bottom and set `use_container_width=True` in `st.plotly_graph`
 * Dewpoint condition (refer to https://www.weather.gov/arx/why_dewpoint_vs_humidity for cutoffs)
   * Would need to rework the cutoff levels which assume an odd number of conditions
-* Pulling climbing areas from OpenBeta (i.e. scrubbing the dump of areas on their GitHub)
-  * Also select better defaults 
 * Optional detailed plot of temp/humidity/precip for a given area (below the condition forecast)
 * Determine cutoffs based on historical observations in Chattanooga 
 
@@ -34,6 +33,7 @@ This is an early, unstable, and barely useful iteration of this app -- this is m
 
 * Is there a better way of aggregating daily info than using the highs?
   * Maybe a count of hours where `condition_score > 0`? In other words, X hours with acceptable conditions
+  * Could also use this for the Current Conditions section
 * Is there a good way to pull forecasted air quality?
 * When it last rained at a location
 * Estimate rock temperature

@@ -7,9 +7,11 @@ st.set_page_config(page_title="Prime Condies: A Weather Tool for Climbers", page
 st.title("Prime Condies")
 st.write("Welcome to Prime Condies, a simple app for climbing conditions. Get psyched :the_horns:")
 
-selected_areas = st.multiselect("Select climbing areas for forecasts", 
-                                options=DEFAULT_LOCATIONS.keys(), max_selections=10, 
-                                default=['Dayton Pocket', 'Rocktown', 'Upper Middle Creek', "Obed (Lilly Boulders)"])
+all_areas = pd.read_csv('data/climbing_locations.csv')
+selected_areas = st.multiselect("Select climbing areas for forecasts (taken from MP hierarchy)", 
+                                options=all_areas['composite_name'], max_selections=10, 
+                                default=['Tennessee > Dayton Pocket/Laurel Falls Bouldering', 'Georgia > Rocktown', 'Tennessee > Middle Creek', 'Tennessee > Stone Fort (aka Little Rock City)']
+                                )
 if len(selected_areas) == 0:
     st.warning("Please select one or more climbing destinations to get started")
 else:
@@ -44,7 +46,7 @@ else:
     daily_forecasts = {}
     hourly_forecasts = {}
     for area in selected_areas:
-        locations[area] = ClimbingLocation(*DEFAULT_LOCATIONS[area])
+        locations[area] = ClimbingLocation(**all_areas.loc[all_areas['composite_name'] == area, ['latitude', 'longitude']].iloc[0])
         daily_forecasts[area] = locations[area].retrieve_12hr_forecast()
         hourly_forecasts[area] = locations[area].retrieve_hourly_forecast()
         daily_forecasts[area].df['area'] = area
