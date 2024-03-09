@@ -6,22 +6,6 @@ from dataclasses import dataclass
 from typing import Union
 from collections import Counter
 
-# this group of default locations is mostly for basic functionality 
-# until i add location search (much later)
-# map location name : (lat, lon)
-DEFAULT_LOCATIONS = {
-    "Stone Fort (LRC)": (35.2477368,-85.2230326),
-    "Joe's Valley": (39.2765, -111.17387),
-    "Dayton Pocket": (35.5264821,-85.0242827),
-    "Rocktown": (34.6590035,-85.3914826),
-    "Little River Canyon": (34.35929, -85.66846),
-    "Upper Middle Creek": (35.149630,-85.351334),
-    "Woodcock Cove": (35.337004,-85.4532359),
-    "Foster Falls": (35.1821082,-85.6754071),
-    "Obed (Lilly Boulders)": (36.1026999,-84.7240969),
-    "Moe's Valley": (37.06928, -113.62301)
-}
-
 # base class for locations + managing API requests
 class ClimbingLocation:
     '''

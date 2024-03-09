@@ -1,6 +1,6 @@
 import streamlit as st 
 import pandas as pd
-from src.utils import DEFAULT_LOCATIONS, ClimbingLocation, Condition, aggregate_conditions
+from src.utils import ClimbingLocation, Condition, aggregate_conditions
 import src.plotly_graphs as plot
 
 st.set_page_config(page_title="Prime Condies: A Weather Tool for Climbers", page_icon=":man_climbing:")
@@ -10,7 +10,7 @@ st.write("Welcome to Prime Condies, a simple app for climbing conditions. Get ps
 all_areas = pd.read_csv('data/climbing_locations.csv')
 selected_areas = st.multiselect("Select climbing areas for forecasts (taken from MP hierarchy)", 
                                 options=all_areas['composite_name'], max_selections=10, 
-                                default=['Tennessee > Dayton Pocket/Laurel Falls Bouldering', 'Georgia > Rocktown', 'Tennessee > Middle Creek', 'Tennessee > Stone Fort (aka Little Rock City)']
+                                default=['TN > Dayton Pocket/Laurel Falls Bouldering', 'GA > Rocktown', 'TN > Middle Creek', 'TN > Foster Falls']
                                 )
 if len(selected_areas) == 0:
     st.warning("Please select one or more climbing destinations to get started")
@@ -88,12 +88,16 @@ else:
     # use the first hourly forecast entry for each area for current conditions (it's the current hour at the time of the request)
     current_df = hourly_df.query("number == 1")[['area', 'temperature', 'humidity', 'precipitation', 
                                                 'temperature_condition', 'humidity_condition', 'precipitation_condition', 'shortForecast']].set_index("area")
+    
+    next_24h = hourly_df.query("number <= 24")\
+        .groupby("area")\
+        .agg(good_hours = ('condition_score', lambda x: sum(x>0)))
 
     # write the current conditions
-    current_columns = st.columns(3)
+    current_columns = st.columns(2)
     for i, area in enumerate(selected_areas):
         area_row = current_df.loc[area]
-        with current_columns[i % 3]:
+        with current_columns[i % 2]:
             st.markdown(            
                 f"""
                 ##### {area}
@@ -101,6 +105,7 @@ else:
                 - {area_row['temperature']}&deg;F {condition_to_emoji[area_row['temperature_condition']]}
                 - {area_row['humidity']}% humidity {condition_to_emoji[area_row['humidity_condition']]}
                 - {area_row['precipitation']}% precipitation {condition_to_emoji[area_row['precipitation_condition']]}
+                - {next_24h.loc[area, 'good_hours']} of the next 24 hours are at least decent
                 """
             )
 

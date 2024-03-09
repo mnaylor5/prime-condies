@@ -17,7 +17,7 @@ This is an early, unstable, and barely useful iteration of this app -- this is m
 * Location selection from OpenBeta's static dataset
 * User-specified preferences for ideal and acceptable conditions
 * Retrieve hourly and daily forecast for all selected locations
-* Show current conditions for selected locations as a heads-up summary
+* Show current conditions for selected locations as a heads-up summary, including how many of the next 24 hours are at least decent according to condition preferences
 * Plot hourly and daily condition outlook as a heatmap
 
 ### Still To Do
@@ -33,7 +33,6 @@ This is an early, unstable, and barely useful iteration of this app -- this is m
 
 * Is there a better way of aggregating daily info than using the highs?
   * Maybe a count of hours where `condition_score > 0`? In other words, X hours with acceptable conditions
-  * Could also use this for the Current Conditions section
 * Is there a good way to pull forecasted air quality?
 * When it last rained at a location
 * Estimate rock temperature
