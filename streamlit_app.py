@@ -93,21 +93,19 @@ else:
         .groupby("area")\
         .agg(good_hours = ('condition_score', lambda x: sum(x>0)))
 
-    # write the current conditions
-    current_columns = st.columns(2)
-    for i, area in enumerate(selected_areas):
-        area_row = current_df.loc[area]
-        with current_columns[i % 2]:
-            st.markdown(            
-                f"""
-                ##### {area}
-                {area_row['shortForecast']}
-                - {area_row['temperature']}&deg;F {condition_to_emoji[area_row['temperature_condition']]}
-                - {area_row['humidity']}% humidity {condition_to_emoji[area_row['humidity_condition']]}
-                - {area_row['precipitation']}% precipitation {condition_to_emoji[area_row['precipitation_condition']]}
-                - {next_24h.loc[area, 'good_hours']} of the next 24 hours are at least decent
-                """
-            )
+    # write the current conditions as a table ordered by the number of good hours in the next daay
+    current_df['temperature_text'] = current_df['temperature'].astype(str) + "&deg;F " + current_df['temperature_condition'].map(condition_to_emoji)
+    current_df['humidity_text'] = current_df['humidity'].astype(str) + "% " + current_df['humidity_condition'].map(condition_to_emoji)
+    current_df['precipitation_text'] = current_df['precipitation'].astype(str) + "% " + current_df['precipitation_condition'].map(condition_to_emoji)
+    current_overview_df = current_df[['temperature_text', 'humidity_text', 'precipitation_text']]\
+        .join(next_24h)\
+        .reset_index(drop=False)\
+        .sort_values("good_hours", ascending=False)\
+        .rename(columns={'temperature_text': 'Temperature', 'humidity_text':'Humidity', 
+                         'precipitation_text':'Chance of Precip.', 'good_hours':'Decent Hours in the Next 24hrs',
+                         'area':'Location'})
+    
+    st.markdown(current_overview_df.to_markdown(index=False))
 
     st.write("## Condition Outlook")
     st.write("""
