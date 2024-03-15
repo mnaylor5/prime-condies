@@ -19,6 +19,7 @@ This is an early, unstable, and barely useful iteration of this app -- this is m
 * Retrieve hourly and daily forecast for all selected locations
 * Show current conditions for selected locations as a table, including how many of the next 24 hours are at least decent according to condition preferences
 * Plot hourly and daily condition outlook as a heatmap
+* Hourly plot of actual forecast values with condition value behind (darker green = better)
 
 ### Still To Do
 
@@ -26,7 +27,6 @@ This is an early, unstable, and barely useful iteration of this app -- this is m
 * Probably figure out a good way to move the colorbar to the bottom and set `use_container_width=True` in `st.plotly_graph`
 * Dewpoint condition (refer to https://www.weather.gov/arx/why_dewpoint_vs_humidity for cutoffs)
   * Would need to rework the cutoff levels which assume an odd number of conditions
-* Optional detailed plot of temp/humidity/precip for a given area (below the condition forecast)
 
 ### Unknown / Needs Refinement / Long Term
 

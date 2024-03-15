@@ -8,8 +8,8 @@ st.title("Prime Condies")
 st.write("Welcome to Prime Condies, a simple app for climbing conditions. Get psyched :the_horns:")
 
 all_areas = pd.read_csv('data/climbing_locations.csv')
-selected_areas = st.multiselect("Select climbing areas for forecasts (taken from MP hierarchy)", 
-                                options=all_areas['composite_name'], max_selections=10, 
+selected_areas = st.multiselect("Select climbing areas", 
+                                options=all_areas['composite_name'], max_selections=10, help="Locations taken from Mountain Project hierarchy. If you can't find your crag, try a higher-level grouping from MP.",
                                 default=['TN > Dayton Pocket/Laurel Falls Bouldering', 'GA > Rocktown', 'TN > Middle Creek', 'TN > Foster Falls']
                                 )
 if len(selected_areas) == 0:
@@ -133,6 +133,17 @@ else:
         st.plotly_chart(plot.plot_hourly_heatmap(hourly_plot_df, periods=hourly_periods))
 
         st.write("Note: You can click and drag horizontally to zoom to a particular time period on this plot. Double-click to reset.")
+    
+    st.write("""
+    ## Detailed Forecast
+    If you're interested in the actual forecast values for a location, you can view that here. The plot below shows hourly forecast values,
+    with overall condition quality represented by the color of the background -- darker green corresponds to better conditions.
+    """)
+
+    detailed_area = st.selectbox("Detailed forecast location", options=selected_areas)
+    specific_area_df = hourly_df[hourly_df['area'] == detailed_area].sort_values("number")
+    detailed_starting_time = st.selectbox("Select a starting time for the 48-hour plot", specific_area_df['startTime'].unique())
+    st.plotly_chart(plot.plot_hourly_forecast_values(specific_area_df[specific_area_df['startTime'] >= detailed_starting_time].iloc[:48]))
 
     with st.expander("About the app"):
         st.write(

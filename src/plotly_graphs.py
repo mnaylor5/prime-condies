@@ -2,30 +2,6 @@ import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
 
-def plot_daily_forecast(daily_df, filter_to_daytime=True):
-    """
-    The daily_df has a `name` attribute which is more useful than the timestamps
-
-    TODO:
-    - color background according to overall conditions (see "Add Lines and Rectangles" on https://plotly.com/python/facet-plots/)
-    - summary in hovertext?
-    """
-    if filter_to_daytime:
-        daily_df = daily_df.query("isDaytime")
-    melted = daily_df.melt(id_vars = ['area', 'name', 'condition_score'], value_vars=['temperature', 'humidity', 'precipitation'], var_name="condition")
-
-    melted['condition_bucket'] = ['PRIME' if x == 2 else 'Trash :(' if x == 0 else 'Maybe decent' for x in melted['condition_score']]
-    melted['condition'] = melted['condition'].str.title()
-    fig = px.line(melted, x="name", y="value", color="condition", line_dash="condition", facet_col="area", 
-                  facet_col_wrap=2, facet_col_spacing=0.06, hover_name='condition_bucket',
-                  markers=True, facet_row_spacing=0.06, height=800, width=900)
-
-    fig.update_layout(title="7-Day Forecast", xaxis_title=None)
-    fig.update_yaxes(title=None)
-    fig.for_each_annotation(lambda a: a.update(text=a.text.split("=")[-1]))
-    fig.update_legends(title=None)
-    return fig
-
 score_to_name = {1:"PRIME", 0.75:"Great", 0.5:"Pretty good", 0.25:"Better than the gym", 0:"Trash :(", '':"No data"}
 
 def plot_daily_heatmap(daily_df, filter_to_daytime=True):
@@ -105,4 +81,27 @@ def plot_hourly_heatmap(hourly_df, periods=48):
         )
     ))
     fig.update_layout(title="Hourly Condition Outlook (Best Options First)", template="plotly_white")
+    return fig
+
+def plot_hourly_forecast_values(df):
+    '''
+    Use a pre-filtered (to location and time frame) dataframe to plot raw hourly forecasts along with
+    the composite condition score as the background color
+    '''
+    fig = go.Figure()
+    fig.add_trace(
+        go.Bar(x = df['startTime'], 
+               y=df['startTime'].apply(lambda x: 100),
+               marker_color=df['condition_score'], 
+               marker_colorscale="greens", 
+               marker_cmax=0.0,
+               marker_cmin=1.0,
+               opacity=0.5, 
+               name="Condition Quality"
+    ))
+    fig.add_trace(go.Scatter(x = df['startTime'], y=df['temperature'], name="Temperature"))
+    fig.add_trace(go.Scatter(x = df['startTime'], y=df['humidity'], name="Humidity"))
+    fig.add_trace(go.Scatter(x = df['startTime'], y=df['precipitation'], name="Precipitation %"))
+    fig.add_trace(go.Scatter(x = df['startTime'], y=df['dewpoint_f'], name="Dewpoint", marker_color="black"))
+    fig.update_layout(title=f"Hourly Forecast Values for {df['area'].iloc[0]}", bargap=0.0)
     return fig
