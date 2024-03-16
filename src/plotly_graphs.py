@@ -39,18 +39,11 @@ def plot_daily_bar_chart(area_hourly_df, title):
         showlegend=False
     ))
     
+    fig.update(layout_coloraxis_showscale=False)
     fig.update_layout(
         yaxis=dict(title="Good Hours", tickvals=[0, 3, 6, 9, 12], range=[0, 13.5]),
         xaxis=dict(title=None),
-        coloraxis_colorbar = dict(
-            title=None,
-            tickvals=[0, 0.25, 0.5, 0.75, 1],
-            labelalias = score_to_name,
-            ticks="outside",
-            orientation="h",
-            y=0.15,
-            yref="container"
-    ))
+    )
 
     return fig
 
@@ -74,6 +67,7 @@ def plot_hourly_forecast_values(df):
     fig.add_trace(go.Scatter(x = df['startTime'], y=df['humidity'], name="Humidity"))
     fig.add_trace(go.Scatter(x = df['startTime'], y=df['precipitation'], name="Precipitation %"))
     fig.add_trace(go.Scatter(x = df['startTime'], y=df['dewpoint_f'], name="Dewpoint", marker_color="black"))
-    fig.update_layout(title=f"Hourly Forecast Values for {df['area'].iloc[0]}", bargap=0.0,
+    fig.update_layout(title=f"Hourly Forecast Values for {df['area'].iloc[0]}",
+                      bargap=0.0,
                       legend=dict(orientation='h', y=0.05, yref='container'))
     return fig
