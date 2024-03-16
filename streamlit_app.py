@@ -137,8 +137,6 @@ else:
     quality (darker green = better condies). 
     """)
 
-    st.dataframe(hourly_df)
-
     for area in current_overview_df['Location'].values:
         st.plotly_chart(plot.plot_daily_bar_chart(hourly_df.query(f"area == '{area}'"), title=area), use_container_width=True)
     
