@@ -81,7 +81,10 @@ else:
     hourly_df['dewpoint_condition'] = hourly_df['dewpoint_f'].apply(dewpoint.assess)
     hourly_df['condition_score'] = hourly_df.apply(lambda x: aggregate_conditions(x['humidity_condition'], x['precipitation_condition'], x['temperature_condition'], x['dewpoint_condition']), axis=1)
     hourly_df['hour'] = hourly_df['startTime'].dt.hour
-    hourly_df['forecast_period'] = hourly_df['startTime'].dt.day_name() + np.where((hourly_df['hour'] >= 8) & (hourly_df['hour'] < 20), "", " Night")
+    # this 8-hour shift is hard-coded to make the "day name" align to our definition of day/night
+    # 8am-8pm daytime; 8pm-8am nighttime (e.g. Friday followed by Friday Night)
+    # this could be a user option too
+    hourly_df['forecast_period'] = (hourly_df['startTime'] - np.timedelta64(8, "h")).dt.day_name() + np.where((hourly_df['hour'] >= 8) & (hourly_df['hour'] < 20), "", " Night")
 
     # convert condition results to emojis for the current condition readout
     condition_to_emoji = {
@@ -134,7 +137,10 @@ else:
     quality (darker green = better condies). 
     """)
 
-    st.plotly_chart(plot.plot_daily_bar_chart(hourly_df), use_container_width=True)
+    st.dataframe(hourly_df)
+
+    for area in current_overview_df['Location'].values:
+        st.plotly_chart(plot.plot_daily_bar_chart(hourly_df.query(f"area == '{area}'"), title=area), use_container_width=True)
     
     st.write("""
     ## Detailed Hourly Forecast

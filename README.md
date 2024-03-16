@@ -19,18 +19,16 @@ This is an early, unstable, and barely useful iteration of this app -- this is m
 * Retrieve hourly and daily forecast for all selected locations
 * Show current conditions for selected locations as a table, including how many of the next 24 hours are at least decent according to condition preferences
 * Daily plot of aggrergate conditions (stacked bar chart of quality hours)
-* Hourly plot of actual forecast values with condition value behind (darker green = better)
+* Hourly plot of actual forecast values with condition value overlaid as background color
 
 ### Still To Do
 
-* Word wrapping long destination names on the heatmaps (possibly just manually add `<br>` tags at regular intervals)
-* Probably figure out a good way to move the colorbar to the bottom and set `use_container_width=True` in `st.plotly_graph`
+* Figure out better mobile rendering (maybe static plots)
+* Clean up OpenBeta dataset
 
 ### Unknown / Needs Refinement / Long Term
 
-* Is there a better way of aggregating daily info than using the highs?
-  * Maybe a count of hours where `condition_score > 0`? In other words, X hours with acceptable conditions
 * Determine cutoffs based on historical observations in Chattanooga?
-* Is there a good way to pull forecasted air quality?
-* When it last rained at a location
-* Estimate rock temperature
+* Is there a good way to pull forecasted air quality? (not really with free options)
+* When it last rained at a location (probably not possible with free options)
+* Estimate rock temperature (long term)
