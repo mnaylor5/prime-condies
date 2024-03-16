@@ -81,7 +81,7 @@ else:
     hourly_df['dewpoint_condition'] = hourly_df['dewpoint_f'].apply(dewpoint.assess)
     hourly_df['condition_score'] = hourly_df.apply(lambda x: aggregate_conditions(x['humidity_condition'], x['precipitation_condition'], x['temperature_condition'], x['dewpoint_condition']), axis=1)
     hourly_df['hour'] = hourly_df['startTime'].dt.hour
-    hourly_df['forecast_period'] = hourly_df['startTime'].dt.strftime("%m/%d") + np.where((hourly_df['hour'] >= 8) & (hourly_df['hour'] < 20), "", " Night")
+    hourly_df['forecast_period'] = hourly_df['startTime'].dt.day_name() + np.where((hourly_df['hour'] >= 8) & (hourly_df['hour'] < 20), "", " Night")
 
     # convert condition results to emojis for the current condition readout
     condition_to_emoji = {

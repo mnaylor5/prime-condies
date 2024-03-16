@@ -7,7 +7,8 @@ score_to_name = {1:"PRIME", 0.75:"Great", 0.5:"Pretty good", 0.25:"Better than t
 def plot_daily_bar_chart(hourly_df):
     daily_agg = hourly_df\
         .groupby(["area", "forecast_period", "condition_score"], as_index=False)\
-        .agg(good_hours = ("condition_score", lambda x : (x > 0).sum()))
+        .agg(good_hours = ("condition_score", lambda x : (x > 0).sum()), start_time= ("startTime", "min"))\
+        .sort_values(["area", "start_time"])
     
     fig = px.bar(daily_agg, 
                  x="forecast_period", 
