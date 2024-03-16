@@ -24,7 +24,7 @@ def plot_daily_bar_chart(area_hourly_df, title):
                  color="condition_score", 
                  color_continuous_scale="greens",
                  range_color=(0, 1),
-                 height=300,
+                 height=400,
                  title=title,
                  barmode="stack")
     
@@ -46,6 +46,9 @@ def plot_daily_bar_chart(area_hourly_df, title):
             tickvals=[0, 0.25, 0.5, 0.75, 1],
             labelalias = score_to_name,
             ticks="outside",
+            orientation="h",
+            y=0.2,
+            yref="container"
     ))
 
     return fig
