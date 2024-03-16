@@ -2,7 +2,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
 
-score_to_name = {1:"PRIME", 0.75:"Great", 0.5:"Pretty good", 0.25:"Better than the gym", 0:"Trash :(", '':"No data"}
+score_to_name = {1:"PRIME", 0.75:"Great", 0.5:"Pretty good", 0.25:"Not awful", 0:"Trash :(", '':"No data"}
 
 def plot_daily_bar_chart(area_hourly_df, title):
     '''
@@ -28,6 +28,7 @@ def plot_daily_bar_chart(area_hourly_df, title):
                  title=title,
                  barmode="stack")
     
+    # add the numbers above the bar for easy reading
     grouped = daily_agg.groupby("forecast_period").agg({'good_hours':'sum'})
     fig.add_trace(go.Scatter(
         x=grouped.index, 
@@ -40,14 +41,14 @@ def plot_daily_bar_chart(area_hourly_df, title):
     
     fig.update_layout(
         yaxis=dict(title="Good Hours", tickvals=[0, 3, 6, 9, 12], range=[0, 13.5]),
-        xaxis=dict(title=None, tickangle=25),
+        xaxis=dict(title=None),
         coloraxis_colorbar = dict(
             title=None,
             tickvals=[0, 0.25, 0.5, 0.75, 1],
             labelalias = score_to_name,
             ticks="outside",
             orientation="h",
-            y=0.2,
+            y=0.15,
             yref="container"
     ))
 
