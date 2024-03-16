@@ -1,5 +1,6 @@
 import streamlit as st 
 import pandas as pd
+import numpy as np
 from src.utils import ClimbingLocation, Condition, aggregate_conditions
 import src.plotly_graphs as plot
 
@@ -80,6 +81,7 @@ else:
     hourly_df['dewpoint_condition'] = hourly_df['dewpoint_f'].apply(dewpoint.assess)
     hourly_df['condition_score'] = hourly_df.apply(lambda x: aggregate_conditions(x['humidity_condition'], x['precipitation_condition'], x['temperature_condition'], x['dewpoint_condition']), axis=1)
     hourly_df['hour'] = hourly_df['startTime'].dt.hour
+    hourly_df['forecast_period'] = hourly_df['startTime'].dt.strftime("%m/%d") + np.where((hourly_df['hour'] >= 8) & (hourly_df['hour'] < 20), "", " Night")
 
     # convert condition results to emojis for the current condition readout
     condition_to_emoji = {
@@ -109,7 +111,7 @@ else:
 
     # write the current conditions as a table ordered by the number of good hours in the next daay
     current_df['temperature_text'] = current_df['temperature'].astype(str) + "&deg;F " + current_df['temperature_condition'].map(condition_to_emoji)
-    current_df['dewpoint_text'] = current_df['dewpoint_f'].astype(str) + "&deg;F " + current_df['dewpoint_condition'].map(condition_to_emoji)
+    current_df['dewpoint_text'] = current_df['dewpoint_f'].astype(int).astype(str) + "&deg;F " + current_df['dewpoint_condition'].map(condition_to_emoji)
     current_df['humidity_text'] = current_df['humidity'].astype(str) + "% " + current_df['humidity_condition'].map(condition_to_emoji)
     current_df['precipitation_text'] = current_df['precipitation'].astype(str) + "% " + current_df['precipitation_condition'].map(condition_to_emoji)
     current_overview_df = current_df[['temperature_text', 'dewpoint_text', 'humidity_text', 'precipitation_text']]\
@@ -125,43 +127,25 @@ else:
     
     st.markdown(current_overview_df.to_markdown(index=False))
 
-    st.write("## Condition Outlook")
+    st.write("## Daily Condition Outlook")
     st.write("""
-    Use the radio button to select whether you want to see forecasts by hour or by 12-hour blocks. Hourly forecasts will be more detailed,
-    while daily uses the highs (during daytime) and lows (at night). The forecasts will appear as a heatmap grid of areas and time periods, 
-    where each entry is shaded according to the overall condition quality (darker green = better condies). 
+    The plot below shows the overall condition outlook for each location you've requested. Each 12-hour period (8am-8pm local time)
+    has a bar whose height represents the number of overall decent hours, and each section is shaded according to the overall condition 
+    quality (darker green = better condies). 
     """)
-    forecast_selection = st.radio("Forecast detail", options=["Hourly", "Daily"])
-        
 
-    if forecast_selection == 'Daily':
-        daytime_only = st.checkbox("Daytime hours only?", value=True)
-        st.plotly_chart(plot.plot_daily_heatmap(daily_df, filter_to_daytime=daytime_only))
-    else:
-        col1, col2 = st.columns(2)
-        with col1:
-            starting_time = st.selectbox("Select starting point for hourly forecast", options=hourly_df['startTime'].unique())
-        with col2:
-            hourly_periods = st.number_input("Hourly periods to plot", value=hourly_df['number'].max(), min_value=12, max_value=hourly_df['number'].max())
-
-        hourly_plot_df = hourly_df[
-            hourly_df['startTime'] >= starting_time
-        ]
-        
-        st.plotly_chart(plot.plot_hourly_heatmap(hourly_plot_df, periods=hourly_periods))
-
-        st.write("Note: You can click and drag horizontally to zoom to a particular time period on this plot. Double-click to reset.")
+    st.plotly_chart(plot.plot_daily_bar_chart(hourly_df), use_container_width=True)
     
     st.write("""
-    ## Detailed Forecast
+    ## Detailed Hourly Forecast
     If you're interested in the actual forecast values for a location, you can view that here. The plot below shows hourly forecast values,
-    with overall condition quality represented by the color of the background -- darker green corresponds to better conditions.
+    with overall condition quality represented by the color of the background -- same as above, darker green corresponds to better conditions.
     """)
 
     detailed_area = st.selectbox("Detailed forecast location", options=selected_areas)
     specific_area_df = hourly_df[hourly_df['area'] == detailed_area].sort_values("number")
     detailed_starting_time = st.selectbox("Select a starting time for the 48-hour plot", specific_area_df['startTime'].unique())
-    st.plotly_chart(plot.plot_hourly_forecast_values(specific_area_df[specific_area_df['startTime'] >= detailed_starting_time].iloc[:48]))
+    st.plotly_chart(plot.plot_hourly_forecast_values(specific_area_df[specific_area_df['startTime'] >= detailed_starting_time].iloc[:48]), use_container_width=True)
 
     with st.expander("About the app"):
         st.write(

@@ -4,42 +4,39 @@ import numpy as np
 
 score_to_name = {1:"PRIME", 0.75:"Great", 0.5:"Pretty good", 0.25:"Better than the gym", 0:"Trash :(", '':"No data"}
 
-def plot_daily_heatmap(daily_df, filter_to_daytime=True):
-    '''
-    Use the wide/tidy `daily_df` to plot a heatmap whose rows are areas and columns
-    are forecast entries
-    '''
-    df = daily_df.query("isDaytime") if filter_to_daytime else daily_df 
-
-    names_in_order = df['name'].unique()
-    daily_heatmap_df = df.set_index('area')\
-        [['name', 'condition_score']]\
-        .pivot(columns='name', values='condition_score')[names_in_order]
+def plot_daily_bar_chart(hourly_df):
+    daily_agg = hourly_df\
+        .groupby(["area", "forecast_period", "condition_score"], as_index=False)\
+        .agg(good_hours = ("condition_score", lambda x : (x > 0).sum()))
     
-    daily_heatmap_df['sum'] = daily_heatmap_df.sum(axis=1)
-    daily_heatmap_df = daily_heatmap_df.sort_values("sum")[names_in_order]
-    heatmap_data = daily_heatmap_df.fillna('').values
-    heatmap_text = np.vectorize(score_to_name.__getitem__)(heatmap_data)
+    fig = px.bar(daily_agg, 
+                 x="forecast_period", 
+                 y="good_hours", 
+                 text="good_hours",
+                 color="condition_score", 
+                 color_continuous_scale="greens",
+                 range_color=(0, 1),
+                 facet_row="area",
+                 facet_row_spacing=0.15, 
+                 height=800,
+                 barmode="stack")
     
-    fig = go.Figure(data = go.Heatmap(
-        z = heatmap_data,
-        text = heatmap_text,
-        x = names_in_order,
-        y = daily_heatmap_df.index,
-        hovertemplate="%{x} at %{y}:<br>%{text}",
-        zmin=0,
-        zmax=1,
-        xgap=0.2,
-        ygap=0.2,
-        colorscale="greens", 
-        colorbar = dict(
-            tickmode="array",
+    fig.for_each_annotation(lambda a: a.update(text=f'<em>{a.text.split("=")[1]}<em>', y=a.y + 0.09, x = 0, textangle=0))
+    fig.update_xaxes(showticklabels=True, title='')
+    fig.update_yaxes(title='')
+    fig.add_annotation(x = -0.1, y=0.5, textangle=-90, text="Good Hours", showarrow=False, xref="paper", yref="paper")
+    
+    fig.update_layout(
+        coloraxis_colorbar = dict(
+            title=None,
+            orientation="h",
             tickvals=[0, 0.25, 0.5, 0.75, 1],
-            ticktext = [score_to_name[x] for x in [0, 0.25, 0.5, 0.75, 1]],
-            ticks="outside"
-        )
+            labelalias = score_to_name,
+            ticks="outside",
+            y=1.0,
+            yref="paper"
     ))
-    fig.update_layout(title="High Level Condition Outlook (Best Options First)", template="plotly_white")
+
     return fig
 
 def plot_hourly_heatmap(hourly_df, periods=48):
@@ -76,7 +73,7 @@ def plot_hourly_heatmap(hourly_df, periods=48):
         colorbar = dict(
             tickmode="array",
             tickvals=[0, 0.25, 0.5, 0.75, 1],
-            ticktext = [score_to_name[x] for x in [0, 0.25, 0.5, 0.75, 1]],
+            labelalias = score_to_name,
             ticks="outside"
         )
     ))
@@ -103,5 +100,6 @@ def plot_hourly_forecast_values(df):
     fig.add_trace(go.Scatter(x = df['startTime'], y=df['humidity'], name="Humidity"))
     fig.add_trace(go.Scatter(x = df['startTime'], y=df['precipitation'], name="Precipitation %"))
     fig.add_trace(go.Scatter(x = df['startTime'], y=df['dewpoint_f'], name="Dewpoint", marker_color="black"))
-    fig.update_layout(title=f"Hourly Forecast Values for {df['area'].iloc[0]}", bargap=0.0)
+    fig.update_layout(title=f"Hourly Forecast Values for {df['area'].iloc[0]}", bargap=0.0,
+                      legend=dict(orientation='h', y=0.05, yref='container'))
     return fig
