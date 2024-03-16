@@ -40,7 +40,7 @@ def plot_daily_bar_chart(area_hourly_df, title):
     
     fig.update_layout(
         yaxis=dict(title="Good Hours", tickvals=[0, 3, 6, 9, 12], range=[0, 13.5]),
-        xaxis=dict(title=None),
+        xaxis=dict(title=None, tickangle=25),
         coloraxis_colorbar = dict(
             title=None,
             tickvals=[0, 0.25, 0.5, 0.75, 1],
