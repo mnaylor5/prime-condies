@@ -109,16 +109,9 @@ def aggregate_conditions(*conditions):
     A function to wrap up multiple condition values. There are currently 5 outcomes:
     - all ideal = "PRIME" / 1.0
     - more ideal than acceptable = "Great conditions" / 0.75
-    - more acceptable than ideal = "Pretty good" / 0.5
+    - more acceptable than ideal (or equal) = "Pretty good" / 0.5
     - all acceptable = "Better than not climbing" / 0.25
     - ANY unacceptable = "Trash" / 0.0
-
-    This doesn't account for any extra weighting between conditions (and it assumes 
-    an odd number of conditions), but we could use these to populate...
-    - the color of a heatmap tile
-    - the color of a constant-height bar in the background of a line plot; range from 
-      some colorblind-friendly set of bad color to good color
-      - monochrome could be a good option (e.g. white to dark blue)
     '''
     counts = Counter(conditions)
     if counts['Unacceptable'] != 0:

@@ -25,8 +25,6 @@ This is an early, unstable, and barely useful iteration of this app -- this is m
 
 * Word wrapping long destination names on the heatmaps (possibly just manually add `<br>` tags at regular intervals)
 * Probably figure out a good way to move the colorbar to the bottom and set `use_container_width=True` in `st.plotly_graph`
-* Dewpoint condition (refer to https://www.weather.gov/arx/why_dewpoint_vs_humidity for cutoffs)
-  * Would need to rework the cutoff levels which assume an odd number of conditions
 
 ### Unknown / Needs Refinement / Long Term
 

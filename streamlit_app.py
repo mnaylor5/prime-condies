@@ -27,16 +27,28 @@ else:
         )
 
         # temperature first: min/max ranges
-        acceptable_min_temp, acceptable_max_temp = st.slider("Acceptable temperature (F)", min_value=0, max_value=100, value=(30, 80))
-        ideal_min_temp, ideal_max_temp = st.slider("Ideal temperature (F)", min_value=0, max_value=100, value=(40, 65))
+        st.write("#### Temperature Ranges")
+        acceptable_min_temp, acceptable_max_temp = st.slider("Acceptable temperature (&deg;F)", min_value=0, max_value=100, value=(30, 80))
+        ideal_min_temp, ideal_max_temp = st.slider("Ideal temperature (&deg;F)", min_value=0, max_value=100, value=(40, 65))
         temperature = Condition(acceptable_low=acceptable_min_temp, acceptable_high=acceptable_max_temp, ideal_low=ideal_min_temp, ideal_high=ideal_max_temp)
 
         # humidity: max only
+        st.write("#### Relative Humidity")
         acceptable_max_humidity = st.slider("Acceptable max humidity", min_value=0, max_value=100, value=70)
         ideal_max_humidity = st.slider("Ideal max humidity", min_value=0, max_value=100, value=50)
         humidity = Condition(acceptable_low=0, acceptable_high=acceptable_max_humidity, ideal_low=0, ideal_high=ideal_max_humidity)
 
+        # dewpoint: max only
+        # references:
+        # [1] https://www.weather.gov/arx/why_dewpoint_vs_humidity (< 55 is dry and comfortable)
+        # [2] https://medium.com/@loukusa/science-friction-62058792d565 (above 60 is too bad to climb)
+        st.write("#### Dewpoint")
+        acceptable_max_dewpoint = st.slider("Acceptable max dewpoint (&deg;F)", min_value=0, max_value=100, value=55)
+        ideal_max_dewpoint = st.slider("Ideal max dewpoint (&deg;F)", min_value=0, max_value=100, value=40)
+        dewpoint = Condition(acceptable_low=0, acceptable_high=acceptable_max_dewpoint, ideal_low=0, ideal_high=ideal_max_dewpoint)
+
         # precip chance: max only
+        st.write("#### Chance of Precipitation")
         acceptable_max_precip = st.slider("Acceptable max precipitation chance", min_value=0, max_value=100, value=40)
         ideal_max_precip = st.slider("Ideal max precipitation chance", min_value=0, max_value=100, value=10)
         precipitation = Condition(acceptable_low=0, acceptable_high=acceptable_max_precip, ideal_low=0, ideal_high=ideal_max_precip)
@@ -65,7 +77,8 @@ else:
     hourly_df['humidity_condition'] = hourly_df['humidity'].apply(humidity.assess)
     hourly_df['precipitation_condition'] = hourly_df['precipitation'].apply(precipitation.assess)
     hourly_df['temperature_condition'] = hourly_df['temperature'].apply(temperature.assess)
-    hourly_df['condition_score'] = hourly_df.apply(lambda x: aggregate_conditions(x['humidity_condition'], x['precipitation_condition'], x['temperature_condition']), axis=1)
+    hourly_df['dewpoint_condition'] = hourly_df['dewpoint_f'].apply(dewpoint.assess)
+    hourly_df['condition_score'] = hourly_df.apply(lambda x: aggregate_conditions(x['humidity_condition'], x['precipitation_condition'], x['temperature_condition'], x['dewpoint_condition']), axis=1)
     hourly_df['hour'] = hourly_df['startTime'].dt.hour
 
     # convert condition results to emojis for the current condition readout
@@ -86,8 +99,9 @@ else:
     )
 
     # use the first hourly forecast entry for each area for current conditions (it's the current hour at the time of the request)
-    current_df = hourly_df.query("number == 1")[['area', 'temperature', 'humidity', 'precipitation', 
-                                                'temperature_condition', 'humidity_condition', 'precipitation_condition', 'shortForecast']].set_index("area")
+    current_df = hourly_df.query("number == 1")[['area', 'temperature', 'humidity', 'precipitation', 'dewpoint_f',
+                                                'temperature_condition', 'humidity_condition', 'precipitation_condition', 
+                                                'dewpoint_condition', 'shortForecast']].set_index("area")
     
     next_24h = hourly_df.query("number <= 24")\
         .groupby("area")\
@@ -95,14 +109,18 @@ else:
 
     # write the current conditions as a table ordered by the number of good hours in the next daay
     current_df['temperature_text'] = current_df['temperature'].astype(str) + "&deg;F " + current_df['temperature_condition'].map(condition_to_emoji)
+    current_df['dewpoint_text'] = current_df['dewpoint_f'].astype(str) + "&deg;F " + current_df['dewpoint_condition'].map(condition_to_emoji)
     current_df['humidity_text'] = current_df['humidity'].astype(str) + "% " + current_df['humidity_condition'].map(condition_to_emoji)
     current_df['precipitation_text'] = current_df['precipitation'].astype(str) + "% " + current_df['precipitation_condition'].map(condition_to_emoji)
-    current_overview_df = current_df[['temperature_text', 'humidity_text', 'precipitation_text']]\
+    current_overview_df = current_df[['temperature_text', 'dewpoint_text', 'humidity_text', 'precipitation_text']]\
         .join(next_24h)\
         .reset_index(drop=False)\
         .sort_values("good_hours", ascending=False)\
-        .rename(columns={'temperature_text': 'Temperature', 'humidity_text':'Humidity', 
-                         'precipitation_text':'Chance of Precip.', 'good_hours':'Decent Hours in the Next 24hrs',
+        .rename(columns={'temperature_text': 'Temperature', 
+                         'dewpoint_text': 'Dewpoint',
+                         'humidity_text':'Humidity', 
+                         'precipitation_text':'Chance of Precip.', 
+                         'good_hours':'Decent Hours in the Next 24hrs',
                          'area':'Location'})
     
     st.markdown(current_overview_df.to_markdown(index=False))
