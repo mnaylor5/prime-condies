@@ -16,9 +16,9 @@ This is an early, unstable, and barely useful iteration of this app -- this is m
 
 * Location selection from OpenBeta's static dataset
 * User-specified preferences for ideal and acceptable conditions
-* Retrieve hourly and daily forecast for all selected locations
+* Retrieve hourly forecast for all selected locations
 * Show current conditions for selected locations as a table, including how many of the next 24 hours are at least decent according to condition preferences
-* Daily plot of aggrergate conditions (stacked bar chart of quality hours)
+* Daily plot of aggregate conditions (stacked bar chart of quality hours)
 * Hourly plot of actual forecast values with condition value overlaid as background color
 
 ### Still To Do

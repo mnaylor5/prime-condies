@@ -60,21 +60,14 @@ else:
     hourly_forecasts = {}
     for area in selected_areas:
         locations[area] = ClimbingLocation(**all_areas.loc[all_areas['composite_name'] == area, ['latitude', 'longitude']].iloc[0])
-        daily_forecasts[area] = locations[area].retrieve_12hr_forecast()
         hourly_forecasts[area] = locations[area].retrieve_hourly_forecast()
         daily_forecasts[area].df['area'] = area
         hourly_forecasts[area].df['area'] = area
 
     # combine all the forecast data across areas
-    daily_df = pd.concat([forecast.df for forecast in daily_forecasts.values()])
     hourly_df = pd.concat([forecast.df for forecast in hourly_forecasts.values()])
 
     # get the bucketing based on condition ranges
-    daily_df['humidity_condition'] = daily_df['humidity'].apply(humidity.assess)
-    daily_df['precipitation_condition'] = daily_df['precipitation'].apply(precipitation.assess)
-    daily_df['temperature_condition'] = daily_df['temperature'].apply(temperature.assess)
-    daily_df['condition_score'] = daily_df.apply(lambda x: aggregate_conditions(x['humidity_condition'], x['precipitation_condition'], x['temperature_condition']), axis=1)
-
     hourly_df['humidity_condition'] = hourly_df['humidity'].apply(humidity.assess)
     hourly_df['precipitation_condition'] = hourly_df['precipitation'].apply(precipitation.assess)
     hourly_df['temperature_condition'] = hourly_df['temperature'].apply(temperature.assess)
