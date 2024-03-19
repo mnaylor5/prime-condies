@@ -56,12 +56,10 @@ else:
 
     # pull everything up front
     locations = {}
-    daily_forecasts = {}
     hourly_forecasts = {}
     for area in selected_areas:
         locations[area] = ClimbingLocation(**all_areas.loc[all_areas['composite_name'] == area, ['latitude', 'longitude']].iloc[0])
         hourly_forecasts[area] = locations[area].retrieve_hourly_forecast()
-        daily_forecasts[area].df['area'] = area
         hourly_forecasts[area].df['area'] = area
 
     # combine all the forecast data across areas
